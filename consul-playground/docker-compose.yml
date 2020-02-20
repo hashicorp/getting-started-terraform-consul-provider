@@ -1,0 +1,62 @@
+version: '3'
+
+services:
+  # consul client agents
+  consul-agent-1: &consul-agent
+    build: ./agent
+    networks:
+      - consul-demo
+    command: "agent -retry-join consul-server-bootstrap -client 0.0.0.0 --config-file /etc/consul.d/default.json"
+
+  consul-agent-2:
+    <<: *consul-agent
+
+  # consul server agents
+  consul-server-1: &consul-server
+    <<: *consul-agent
+    build: ./server
+    command: "agent -server -retry-join consul-server-bootstrap -client 0.0.0.0  --config-file /etc/consul.d/default.json"
+
+  consul-server-2:
+    <<: *consul-server
+
+  consul-server-bootstrap:
+    <<: *consul-server
+    ports:
+      - "8400:8400"
+      - "8500:8500"
+      - "8600:8600"
+      - "8600:8600/udp"
+    command: "agent -server -client 0.0.0.0 --config-file /etc/consul.d/default.json"
+  
+  # consul dashboard app
+  dashboard:
+    container_name: dashboard
+    hostname: dashboard
+    image: 'hashicorp/dashboard-service:0.0.4'
+    restart: always
+    ports:
+      - '8080:8080'
+    environment:
+      PORT: 8080
+      COUNTING_SERVICE_URL: 'http://counting-service:9001'
+    depends_on:
+      - counting-service
+    networks:
+      - consul-demo
+
+  # counting service app
+  counting-service:
+    container_name: counting-service
+    hostname: counting-service
+    image: 'hashicorp/counting-service:0.0.2'
+    restart: always
+    ports:
+      - '9001:9001'
+    environment:
+      PORT: 9001
+    networks:
+      - consul-demo
+  
+networks:
+  consul-demo:
