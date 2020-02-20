@@ -1,14 +1,21 @@
 # Getting Started with Terraform Consul Provider
 
 ## Overview
-This repo contains the `docker-compose.yml` necessary to spin up a Consul DC. 
+This repo contains the `docker-compose.yml` necessary to spin up a Consul DC and counting/dashboard service.
+
 This is used both for local development and Katacoda Scenario.
 
+The ACL setup via docker compose was inspired by: https://github.com/tsurubee/consul-acl-playground
 
 ## Workspace
-Adapted from: https://github.com/tsurubee/consul-acl-playground
 
-Test environment for Consul DC ACL based on Docker
+This workspace contains the following:
+
+- simple Consul datacenter running with ACL pre-configured (UI on port :8500):
+   - 3 Consul servers
+   - 2 Consul clients
+- Counting service running on port :9001
+- Dashboard for counting service running on port :8080
 
 ### Usage
 #### How to use Docker containers
