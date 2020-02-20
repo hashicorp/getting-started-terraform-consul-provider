@@ -1,5 +1,5 @@
 provider "consul" {
-  address    = "[[HOST_SUBDOMAIN]]-8500-[[KATACODA_HOST]].environments.katacoda.com"
+  address    = "localhost:8500"
   datacenter = "dc1"
   token      = "<ACL_TOKEN_HERE>"
 }
@@ -7,27 +7,27 @@ provider "consul" {
 # Register Consul Node - counting
 resource "consul_node" "counting" {
   name    = "counting"
-  address = "[[HOST_SUBDOMAIN]]-9001-[[KATACODA_HOST]].environments.katacoda.com"
+  address = "localhost"
 }
 
 # Register Consul Node - dashboard
 resource "consul_node" "dashboard" {
   name    = "dashboard"
-  address = "[[HOST_SUBDOMAIN]]-8080-[[KATACODA_HOST]].environments.katacoda.com"
+  address = "localhost"
 }
 
 # Register Counting Service
 resource "consul_service" "counting" {
   name    = "counting-service"
   node    = consul_node.counting.name
-  port    = 80
+  port    = 9001
   tags    = ["counting"]
 
   check {
     check_id                          = "service:counting"
     name                              = "Counting health check"
     status                            = "passing"
-    http                              = "[[HOST_SUBDOMAIN]]-9001-[[KATACODA_HOST]].environments.katacoda.com"
+    http                              = "localhost:9001"
     tls_skip_verify                   = false
     method                            = "GET"
     interval                          = "5s"
@@ -45,14 +45,14 @@ resource "consul_service" "counting" {
 resource "consul_service" "dashboard" {
   name    = "dashboard-service"
   node    = consul_node.dashboard.name
-  port    = 80
+  port    = 8080
   tags    = ["dashboard"]
 
   check {
     check_id                          = "service:dashboard"
     name                              = "Dashboard health check"
     status                            = "passing"
-    http                              = "[[HOST_SUBDOMAIN]]-8080-[[KATACODA_HOST]].environments.katacoda.com"
+    http                              = "localhost:8080"
     tls_skip_verify                   = false
     method                            = "GET"
     interval                          = "5s"
