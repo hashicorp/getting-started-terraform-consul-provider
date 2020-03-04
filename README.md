@@ -46,3 +46,29 @@ Node             Address           Status  Type    Build  Protocol  DC       Seg
 consul-server-1  192.168.0.2:8301  alive   server  1.4.0  2         test-dc  <all>
 consul-agent-1   192.168.0.3:8301  alive   client  1.4.0  2         test-dc  <default>
 ```
+
+#### Setting up Consul ESM
+
+To set up and run consul-esm, you need to assign the master ACL token in the esm-config.hcl file. The consul-esm binary has already been downloaded and unzipped in the server binary.
+```
+$ docker exec -it consul-playground_consul-server-1_1 sh -c "echo 'token = \"<TOKEN>\"' > esm-config.hcl"
+```
+
+Then, run the following command. this should initialize consul-esm and automatically register any external nodes.
+```
+$ docker exec -itd consul-playground_consul-server-1_1 sh -c "./consul-esm -config-file=esm-config.hcl"
+2020/03/04 20:11:17 [INFO] Connecting to Consul on 127.0.0.1:8500...
+Consul ESM running!
+            Datacenter: (default)
+               Service: "consul-esm"
+           Service Tag: ""
+            Service ID: "consul-esm:09be447c-2585-4891-474c-9d17875cbab2"
+Node Reconnect Timeout: "72h0m0s"
+
+Log data will now stream in as it occurs:
+
+2020/03/04 20:11:17 [INFO] Trying to obtain leadership...
+2020/03/04 20:11:17 [INFO] Obtained leadership
+2020/03/04 20:11:17 [INFO] Caught signal: window changed
+2020/03/04 20:11:18 [INFO] Rebalanced 0 external nodes across 1 ESM instances
+`
