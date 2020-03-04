@@ -29,7 +29,7 @@ Starting consul-playground_consul-agent_1  ... done
 #### Bootstrapping ACL
 Run the following command to view the Master ACL Token.
 ```
-/ # docker exec -it consul-playground_consul-server-1_1 consul acl bootstrap
+$ docker exec -it consul-playground_consul-server-1_1 consul acl bootstrap
 AccessorID:   8bd3c315-9155-57d7-a22f-451665f71154
 SecretID:     4ec60a89-abaa-fda9-46c1-e6e174094a97
 Description:  Bootstrap Token (Global Management)
@@ -41,8 +41,34 @@ Policies:
 
 Then, you can run the consul command with token like below.  
 ```
-/ # docker exec -it consul-playground_consul-server-1_1 consul members -token=<TOKEN>
+$ docker exec -it consul-playground_consul-server-1_1 consul members -token=<TOKEN>
 Node             Address           Status  Type    Build  Protocol  DC       Segment
 consul-server-1  192.168.0.2:8301  alive   server  1.4.0  2         test-dc  <all>
 consul-agent-1   192.168.0.3:8301  alive   client  1.4.0  2         test-dc  <default>
+```
+
+#### Setting up Consul ESM
+
+To set up and run consul-esm, you need to assign the master ACL token in the esm-config.hcl file. The consul-esm binary has already been downloaded and unzipped in the server binary.
+```
+$ docker exec -it consul-playground_consul-server-1_1 sh -c "echo 'token = \"<TOKEN>\"' > esm-config.hcl"
+```
+
+Then, run the following command. this should initialize consul-esm and automatically register any external nodes.
+```
+$ docker exec -itd consul-playground_consul-server-1_1 sh -c "./consul-esm -config-file=esm-config.hcl"
+2020/03/04 20:11:17 [INFO] Connecting to Consul on 127.0.0.1:8500...
+Consul ESM running!
+            Datacenter: (default)
+               Service: "consul-esm"
+           Service Tag: ""
+            Service ID: "consul-esm:09be447c-2585-4891-474c-9d17875cbab2"
+Node Reconnect Timeout: "72h0m0s"
+
+Log data will now stream in as it occurs:
+
+2020/03/04 20:11:17 [INFO] Trying to obtain leadership...
+2020/03/04 20:11:17 [INFO] Obtained leadership
+2020/03/04 20:11:17 [INFO] Caught signal: window changed
+2020/03/04 20:11:18 [INFO] Rebalanced 0 external nodes across 1 ESM instances
 ```
