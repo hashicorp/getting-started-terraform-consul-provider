@@ -4,65 +4,63 @@ provider "consul" {
   token      = "<ACL_TOKEN_HERE>"
 }
 
-# Register Consul Node - counting
+# Register external node - counting
 resource "consul_node" "counting" {
   name    = "counting"
   address = "[[HOST_SUBDOMAIN]]-9001-[[KATACODA_HOST]].environments.katacoda.com"
+
+  meta = {
+    "external-node"  = "true"
+    "external-probe" = "true"
+  }
 }
 
-# Register Consul Node - dashboard
+# Register external node - dashboard
 resource "consul_node" "dashboard" {
   name    = "dashboard"
   address = "[[HOST_SUBDOMAIN]]-8080-[[KATACODA_HOST]].environments.katacoda.com"
+
+  meta = {
+    "external-node"  = "true"
+    "external-probe" = "true"
+  }
 }
 
 # Register Counting Service
 resource "consul_service" "counting" {
-  name    = "counting-service"
-  node    = consul_node.counting.name
-  port    = 80
-  tags    = ["counting"]
+  name = "counting-service"
+  node = consul_node.counting.name
+  port = 80
+  tags = ["counting"]
 
   check {
-    check_id                          = "service:counting"
-    name                              = "Counting health check"
-    status                            = "passing"
-    http                              = "[[HOST_SUBDOMAIN]]-9001-[[KATACODA_HOST]].environments.katacoda.com"
-    tls_skip_verify                   = false
-    method                            = "GET"
-    interval                          = "5s"
-    timeout                           = "1s"
-    deregister_critical_service_after = "30s"
-
-    header {
-      name  = "foo"
-      value = ["bar"]
-    }
+    check_id        = "service:counting"
+    name            = "Counting health check"
+    status          = "passing"
+    http            = "[[HOST_SUBDOMAIN]]-9001-[[KATACODA_HOST]].environments.katacoda.com"
+    tls_skip_verify = false
+    method          = "GET"
+    interval        = "5s"
+    timeout         = "1s"
   }
 }
 
 # Register Dashboard Service
 resource "consul_service" "dashboard" {
-  name    = "dashboard-service"
-  node    = consul_node.dashboard.name
-  port    = 80
-  tags    = ["dashboard"]
+  name = "dashboard-service"
+  node = consul_node.dashboard.name
+  port = 80
+  tags = ["dashboard"]
 
   check {
-    check_id                          = "service:dashboard"
-    name                              = "Dashboard health check"
-    status                            = "passing"
-    http                              = "[[HOST_SUBDOMAIN]]-8080-[[KATACODA_HOST]].environments.katacoda.com"
-    tls_skip_verify                   = false
-    method                            = "GET"
-    interval                          = "5s"
-    timeout                           = "1s"
-    deregister_critical_service_after = "30s"
-
-    header {
-      name  = "foo"
-      value = ["bar"]
-    }
+    check_id        = "service:dashboard"
+    name            = "Dashboard health check"
+    status          = "passing"
+    http            = "[[HOST_SUBDOMAIN]]-8080-[[KATACODA_HOST]].environments.katacoda.com"
+    tls_skip_verify = false
+    method          = "GET"
+    interval        = "5s"
+    timeout         = "1s"
   }
 }
 
@@ -70,7 +68,7 @@ resource "consul_service" "dashboard" {
 data "consul_services" "dc1" {}
 
 output "consul_services_dc1" {
-    value = data.consul_services.dc1
+  value = data.consul_services.dc1
 }
 
 # List counting service information
@@ -89,7 +87,7 @@ data "consul_service" "agents" {
 
 output "consul_agents_address_ports" {
   value = {
-    for service in data.consul_service.agents.service:
+    for service in data.consul_service.agents.service :
     service.node_id => join(":", [service.node_address, service.port])
   }
 }
