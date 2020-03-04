@@ -27,7 +27,7 @@ services:
       - "8500:8500"
       - "8600:8600"
       - "8600:8600/udp"
-    command: "agent -server -client 0.0.0.0 --config-file /etc/consul.d/default.json"
+    command: sh -c "consul agent -server -client 0.0.0.0 --config-file /etc/consul.d/default.json"
   
   # consul dashboard app
   dashboard:
