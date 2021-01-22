@@ -1,3 +1,12 @@
+terraform {
+  required_providers {
+    consul = {
+      source = "hashicorp/consul"
+      version = "2.11.0"
+    }
+  }
+}
+
 provider "consul" {
   address    = "localhost:8500"
   datacenter = "dc1"
