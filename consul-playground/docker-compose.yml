@@ -7,6 +7,10 @@ services:
   # consul client agents
   consul-agent-1: &consul-agent
     build: ./agent
+    environment:
+      CONSUL_LICENSE_PATH: /run/secrets/license
+    secrets:
+      - license
     networks:
       - consul-demo
     command: "agent -retry-join consul-server-bootstrap -client 0.0.0.0 --config-file /etc/consul.d/default.json"
@@ -18,6 +22,10 @@ services:
   consul-server-1: &consul-server
     <<: *consul-agent
     build: ./server
+    environment:
+      CONSUL_LICENSE_PATH: /run/secrets/license
+    secrets:
+      - license
     command: "agent -server -retry-join consul-server-bootstrap -client 0.0.0.0  --config-file /etc/consul.d/default.json"
 
   consul-server-2:
@@ -60,6 +68,10 @@ services:
       PORT: 9001
     networks:
       - consul-demo
-  
+
+secrets:
+  license:
+    file: ../../consul.lic
+
 networks:
   consul-demo:
